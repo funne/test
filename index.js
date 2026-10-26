@@ -25,6 +25,39 @@ let audioContent;
 let volumeSlider;
 let volumeIcon;
 
+function createSnow() {
+  const snowContainer = document.createElement('div');
+  snowContainer.classList.add('snow-container');
+  document.body.appendChild(snowContainer);
+
+  function createSnowflake() {
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+    
+    const startX = Math.random() * window.innerWidth;
+    const delay = Math.random() * 10;
+    const size = Math.random() * 3 + 1;
+    
+    snowflake.style.left = `${startX}px`;
+    snowflake.style.width = `${size}px`;
+    snowflake.style.height = `${size}px`;
+    snowflake.style.animationDuration = `${randomBetween(10, 20)}s`;
+    snowflake.style.animationDelay = `-${delay}s`;
+    
+    snowContainer.appendChild(snowflake);
+    
+    snowflake.addEventListener('animationiteration', () => {
+      snowflake.remove();
+      createSnowflake();
+    });
+  }
+
+  const snowflakeCount = window.innerWidth < 768 ? 50 : 100;
+  for (let i = 0; i < snowflakeCount; i++) {
+    createSnowflake();
+  }
+}
+
 function refreshIcons() {
   if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
 }
@@ -150,10 +183,7 @@ async function playTrack(index, startTime = 0) {
   if (audioContext.state === 'suspended') {
     try {
       await audioContext.resume();
-      console.log("AudioContext resumed during playTrack call.");
     } catch (e) {
-      console.warn("Failed to resume AudioContext. User interaction might still be needed.", e);
-      
       isPlaying = false;
       setPlayIcon(false);
       updateTrackTitle("Click to Play");
@@ -282,14 +312,13 @@ function seekToClientX(clientX) {
 async function handleFirstInteraction() {
   if (initialInteractionHandled) return; 
 
-  console.log("First user interaction detected.");
+  // console.log("First user interaction detected.");
 
   await initializeAudioContext(); 
 
   if (audioContext.state === 'suspended') {
     try {
       await audioContext.resume();
-      console.log("AudioContext resumed by global interaction.");
     } catch (e) {
       console.error("Failed to resume AudioContext on first interaction:", e);
      
@@ -330,6 +359,7 @@ window.addEventListener('load', async () => {
 
   
   await loadAudioList();
+  //createSnow();
 
   
   setPlayIcon(false);
