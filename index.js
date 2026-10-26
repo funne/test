@@ -58,6 +58,37 @@ function createSnow() {
   }
 }
 
+function randomBetween(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function animate() {
+  const container = document.querySelector('.floating-container');
+  let currentY = 0;
+  let currentRotation = 0;
+  
+  function updatePosition() {
+    const nextY = (Math.random() < 0.5) ? randomBetween(-30, -10) : randomBetween(10, 30);
+    const nextRotation = (Math.random() < 0.5) ? randomBetween(-10, -2) : randomBetween(2, 10);
+    
+    container.animate([
+      { transform: `translateY(${currentY}px) rotate(${currentRotation}deg)` },
+      { transform: `translateY(${nextY}px) rotate(${nextRotation}deg)` },
+      { transform: 'translateY(0px) rotate(0deg)' }
+    ], {
+      duration: 3000,
+      easing: 'ease-in-out',
+      fill: 'forwards'
+    }).onfinish = () => {
+      currentY = 0;
+      currentRotation = 0;
+      setTimeout(updatePosition, 100); 
+    };
+  }
+  
+  updatePosition();
+}
+
 function refreshIcons() {
   if (window.lucide) window.lucide.createIcons({ attrs: { 'aria-hidden': 'true' } });
 }
@@ -99,7 +130,6 @@ async function loadAudioList() {
     const response = await fetch('/audio_list.json');
     tracks = await response.json();
     if (tracks.length > 0) {
-      // no fucking idea what this means but i put it here cause i thought it was funny
       currentTrackIndex = Math.floor(Math.random() * tracks.length);
      
       updateTrackTitle("Click to Play");
@@ -359,6 +389,7 @@ window.addEventListener('load', async () => {
 
   
   await loadAudioList();
+  animate();
   //createSnow();
 
   
